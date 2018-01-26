@@ -12,6 +12,7 @@
   "dependencies": {
     "bufferutil": "^3.0.3",
     "express": "^4.16.2",
+    "express-ws": "^3.0.0",
     "utf-8-validate": "^4.0.0",
     "ws": "^4.0.0"
   }

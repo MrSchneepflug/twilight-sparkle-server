@@ -1,12 +1,12 @@
 const express = require("express");
-const SocketServer = require("ws").Server;
+const app = express();
+const expressWs = require("express-ws")(app);
+
 const path = require("path");
 
-const PORT = process.env.port || 3000;
+const PORT = process.env.port || 5000;
 
-const server = express();
-
-server.get("/", (request, response) => {
+app.get("/", (request, response) => {
     const isMobileDevice = request.headers["user-agent"].match(/Mobile/);
     const indexPath = isMobileDevice
         ? "public/mobile_index.html"
@@ -17,19 +17,12 @@ server.get("/", (request, response) => {
     response.sendFile(INDEX);
 });
 
-server.listen(PORT, () => {
+app.listen(PORT, () => {
     console.log(`listening on port ${PORT}`)
 });
 
-const webSocketServer = new SocketServer({server});
-
-webSocketServer.on("connection", webSocket => {
-    console.log("client connected");
-    webSocket.on("close", () => console.log("client disconnected"));
-});
-
-setInterval(() => {
-    webSocketServer.clients.forEach(client => {
-        client.send(new Date().toTimeString());
+app.ws("/", (ws, request) => {
+    ws.on("message", message => {
+        console.log("received", message);
     });
 });
