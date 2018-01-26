@@ -80,6 +80,12 @@ app.ws("/", (ws, request) => {
 
                 console.log("current state:", state);
                 broadcastState();
+                break;
+            case "reset":
+                console.log("reset");
+                state = {};
+                broadcastState();
+                break;
         }
     });
 });
