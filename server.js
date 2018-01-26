@@ -5,6 +5,7 @@ const expressWs = require("express-ws")(app, null, {
         clientTracking: true
     }
 });
+const _ = require("lodash");
 
 const path = require("path");
 const PORT = process.env.port || 5000;
@@ -26,11 +27,33 @@ app.listen(PORT, () => {
     console.log(`listening on port ${PORT}`)
 });
 
-let members = [];
+const webSocketServer = expressWs.getWss();
+
+// state = {
+//     JJ: null,
+//     ML: 13
+// }
+
+let state = {};
+
+const broadcastState = () => {
+    // `{"origin": "web-socket-server", "action": "setNumbers", "payload": {"numbers": ${JSON.stringify(numbers)}}}`;
+    const broadcastPayload = {
+        origin: "web-socket-server",
+        action: "setState",
+        state
+    };
+
+    const message = JSON.stringify(broadcastPayload);
+
+    console.log("broadcasting", message);
+
+    webSocketServer.clients.forEach(client => {
+        client.send(message);
+    });
+};
 
 app.ws("/", (ws, request) => {
-    const webSocketServer = expressWs.getWss();
-
     ws.on("message", message => {
         console.log("received", message);
 
@@ -39,18 +62,24 @@ app.ws("/", (ws, request) => {
         switch (messageObject.payload.action) {
             case "addMember":
                 console.log("addMember", messageObject.payload.name);
-                members.push(messageObject.payload.name)
-                console.log("current members:", members);
 
-                let broadcastPayload = `{"origin": "web-socket-server", "action": "setMembers", "payload": {"members": ${JSON.stringify(members)}}}`;
+                if (_.has(state, messageObject.payload.name)) {
+                    break;
+                }
 
-                console.log("broadcasting", broadcastPayload);
+                state[messageObject.payload.name] = null;
 
-                webSocketServer.clients.forEach(client => {
-                    client.send(broadcastPayload);
-                });
+                console.log("current state:", state);
+                broadcastState();
 
                 break;
+            case "setNumber":
+                console.log("setNumber", messageObject.payload.number, "name", messageObject.payload.number);
+
+                state[messageObject.payload.name] = messageObject.payload.number;
+
+                console.log("current state:", state);
+                broadcastState();
         }
     });
 });
