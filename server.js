@@ -42,8 +42,12 @@ app.ws("/", (ws, request) => {
                 members.push(messageObject.payload.name)
                 console.log("current members:", members);
 
+                let broadcastPayload = `{"origin": "web-socket-server", "action": "setMembers", "payload": {"members": ${JSON.stringify(members)}}}`;
+
+                console.log("broadcasting", broadcastPayload);
+
                 webSocketServer.clients.forEach(client => {
-                    client.send(`{"origin": "web-socket-server", "payload": {"members": [${JSON.stringify(members)}}]`);
+                    client.send(broadcastPayload);
                 });
 
                 break;
