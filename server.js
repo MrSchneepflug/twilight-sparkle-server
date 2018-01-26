@@ -5,9 +5,18 @@ const path = require("path");
 const PORT = process.env.port || 3000;
 const INDEX = path.join(__dirname, "public/tv_index.html"); // determine by user-agent
 
-const server = express()
-    .use((request, response) => response.sendFile(INDEX))
-    .listen(PORT, () => console.log(`listening on port ${PORT}`));
+const server = express();
+
+server.get("/", (request, response) => {
+    response.send("test");
+});
+
+server.listen(PORT, () => {
+    console.log(`listening on port ${PORT}`);
+});
+
+//    .use((request, response) => response.sendFile(INDEX))
+//    .listen(PORT, () => console.log(`listening on port ${PORT}`));
 
 const webSocketServer = new SocketServer({server});
 
