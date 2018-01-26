@@ -14,7 +14,6 @@ server.get("/", (request, response) => {
 
     const INDEX = path.join(__dirname, indexPath);
 
-    console.log(`client request with user-agent: ${request.headers['user-agent']}`);
     response.sendFile(INDEX);
 });
 
