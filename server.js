@@ -3,20 +3,24 @@ const SocketServer = require("ws").Server;
 const path = require("path");
 
 const PORT = process.env.port || 3000;
-const INDEX = path.join(__dirname, "public/tv_index.html"); // determine by user-agent
 
 const server = express();
 
 server.get("/", (request, response) => {
-    response.send("test");
+    const isMobileDevice = request.headers["user-agent"].match(/Mobile/);
+    const indexPath = isMobileDevice
+        ? "public/mobile_index.html"
+        : "public/tv_index.html";
+
+    const INDEX = path.join(__dirname, indexPath);
+
+    console.log(`client request with user-agent: ${request.headers['user-agent']}`);
+    response.sendFile(INDEX);
 });
 
 server.listen(PORT, () => {
-    console.log(`listening on port ${PORT}`);
+    console.log(`listening on port ${PORT}`)
 });
-
-//    .use((request, response) => response.sendFile(INDEX))
-//    .listen(PORT, () => console.log(`listening on port ${PORT}`));
 
 const webSocketServer = new SocketServer({server});
 
