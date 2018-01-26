@@ -27,13 +27,9 @@ app.listen(PORT, () => {
 });
 
 let members = [];
-let clientPool = [];
 
 app.ws("/", (ws, request) => {
-    ws.on("open", () => {
-        console.log("new connection");
-        clientPool.push(ws);
-    });
+    const webSocketServer = expressWs.getWss();
 
     ws.on("message", message => {
         console.log("received", message);
@@ -45,6 +41,11 @@ app.ws("/", (ws, request) => {
                 console.log("addMember", messageObject.payload.name);
                 members.push(messageObject.payload.name)
                 console.log("current members:", members);
+
+                webSocketServer.clients.forEach(client => {
+                    client.send(`{"origin": "web-socket-server", "payload": {"members": [${JSON.stringify(members)}}]`);
+                });
+
                 break;
         }
     });
