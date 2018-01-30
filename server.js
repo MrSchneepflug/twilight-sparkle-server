@@ -60,8 +60,8 @@ app.ws("/", (ws, request) => {
         const messageObject = JSON.parse(message);
 
         switch (messageObject.payload.action) {
-            case "addMember":
-                console.log("addMember", messageObject.payload.name);
+            case "selectDeveloper":
+                console.log("selectDeveloper", messageObject.payload.name);
 
                 if (_.has(state, messageObject.payload.name)) {
                     break;
