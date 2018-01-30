@@ -46,7 +46,7 @@ const broadcastState = () => {
 
     const message = JSON.stringify(broadcastPayload);
 
-    console.log("broadcasting", message);
+    console.log("--> broadcasting", message);
 
     webSocketServer.clients.forEach(client => {
         client.send(message);
@@ -55,13 +55,13 @@ const broadcastState = () => {
 
 app.ws("/", (ws, request) => {
     ws.on("message", message => {
-        console.log("received", message);
+        console.log("receiving", message);
 
         const messageObject = JSON.parse(message);
 
         switch (messageObject.payload.action) {
             case "selectDeveloper":
-                console.log("selectDeveloper", messageObject.payload.name);
+                console.log("--> selectDeveloper", messageObject.payload.name);
 
                 if (_.has(state, messageObject.payload.name)) {
                     break;
@@ -69,20 +69,27 @@ app.ws("/", (ws, request) => {
 
                 state[messageObject.payload.name] = null;
 
-                console.log("current state:", state);
+                console.log("--> current state:", state);
                 broadcastState();
-
                 break;
-            case "setNumber":
-                console.log("setNumber", messageObject.payload.number, "name", messageObject.payload.number);
+            case "resetDeveloperSelection":
+                console.log("--> resetDeveloperSelection", messageObject.payload.name);
 
-                state[messageObject.payload.name] = messageObject.payload.number;
+                delete state[messageObject.payload.name];
 
-                console.log("current state:", state);
+                console.log("--> current state:", state);
+                broadcastState();
+                break;
+            case "selectEstimation":
+                console.log("--> selectEstimation", messageObject.payload.name, messageObject.payload.estimation);
+
+                state[messageObject.payload.name] = messageObject.payload.estimation;
+
+                console.log("--> current state:", state);
                 broadcastState();
                 break;
             case "reset":
-                console.log("reset");
+                console.log("--> reset");
                 state = {};
                 broadcastState();
                 break;
