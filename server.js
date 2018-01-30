@@ -69,31 +69,24 @@ app.ws("/", (ws, request) => {
         }
 
         state[messageObject.payload.name] = null;
-
-        console.log("--> current state:", state);
-        broadcastState();
         break;
       case "resetDeveloperSelection":
         console.log("--> resetDeveloperSelection", messageObject.payload.name);
 
         delete state[messageObject.payload.name];
-
-        console.log("--> current state:", state);
-        broadcastState();
         break;
       case "selectEstimation":
         console.log("--> selectEstimation", messageObject.payload.name, messageObject.payload.estimation);
 
         state[messageObject.payload.name] = messageObject.payload.estimation;
-
-        console.log("--> current state:", state);
-        broadcastState();
         break;
       case "reset":
         console.log("--> reset");
         state = {};
-        broadcastState();
         break;
     }
+
+    console.log("--> current state:", state);
+    broadcastState();
   });
 });
