@@ -29,22 +29,10 @@ app.listen(PORT, () => {
 
 const webSocketServer = expressWs.getWss();
 
-// state = {
-//     JJ: null,
-//     ML: 13
-// }
+let estimationsByDeveloper = {};
 
-let state = {};
-
-const broadcastState = () => {
-  // `{"origin": "web-socket-server", "action": "setNumbers", "payload": {"numbers": ${JSON.stringify(numbers)}}}`;
-  const broadcastPayload = {
-    origin: "web-socket-server",
-    action: "setState",
-    state
-  };
-
-  const message = JSON.stringify(broadcastPayload);
+const broadcast = (payload) => {
+  const message = JSON.stringify(payload);
 
   console.log("--> broadcasting", message);
 
@@ -52,6 +40,44 @@ const broadcastState = () => {
     client.send(message);
   });
 };
+
+const createMessage = (recipient, action, additionalPayload = {})  => {
+  return {
+    origin: "web-socket-server",
+    recipient,
+    action,
+    payload: {
+      estimationsByDeveloper,
+      ...additionalPayload
+    }
+  };
+};
+
+// const VALID_RECIPIENTS = [
+//   "*",
+//   "tv-client",
+//   "mobile-client"
+// ];
+//
+// const VALID_ACTIONS = [
+//   "setEstimationsByDeveloper",
+//   "reset"
+// ];
+
+// const exampleMessage = {
+//   origin: "web-socket-server",
+//   recipient: "*",
+//   action: "setEstimationsByDeveloper",
+//   payload: {
+//     estimationsByDeveloper: {
+//       JJ: null,
+//       TK: 13
+//     },
+//     additionalPayload: {
+//
+//     }
+//   }
+// };
 
 app.ws("/", (ws, request) => {
   ws.on("message", message => {
@@ -63,30 +89,37 @@ app.ws("/", (ws, request) => {
       case "selectDeveloper":
         console.log("--> selectDeveloper", messageObject.payload.name);
 
-        if (_.has(state, messageObject.payload.name)) {
+        if (_.has(estimationsByDeveloper, messageObject.payload.name)) {
           console.log(`--> ${messageObject.payload.name} already in state ...`);
           break;
         }
 
-        state[messageObject.payload.name] = null;
+        estimationsByDeveloper[messageObject.payload.name] = null;
+
+        broadcast(createMessage("*", "setEstimationsByDeveloper"));
         break;
       case "resetDeveloperSelection":
         console.log("--> resetDeveloperSelection", messageObject.payload.name);
 
-        delete state[messageObject.payload.name];
+        delete estimationsByDeveloper[messageObject.payload.name];
+
+        broadcast(createMessage("*", "setEstimationsByDeveloper"));
         break;
       case "selectEstimation":
         console.log("--> selectEstimation", messageObject.payload.name, messageObject.payload.estimation);
 
-        state[messageObject.payload.name] = messageObject.payload.estimation;
+        estimationsByDeveloper[messageObject.payload.name] = messageObject.payload.estimation;
+
+        broadcast(createMessage("*", "setEstimationsByDeveloper"));
         break;
       case "reset":
         console.log("--> reset");
-        state = {};
+        estimationsByDeveloper = {};
+
+        broadcast(createMessage("*", "reset"));
         break;
     }
 
-    console.log("--> current state:", state);
-    broadcastState();
+    console.log("--> current state:", estimationsByDeveloper);
   });
 });
