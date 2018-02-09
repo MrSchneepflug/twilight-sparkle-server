@@ -41,13 +41,12 @@ const broadcast = (payload) => {
   });
 };
 
-const createMessage = (action, additionalPayload = {})  => {
+const createMessage = (action, payload = {})  => {
   return {
     origin: "web-socket-server",
     action,
     payload: {
-      estimationsByDeveloper,
-      ...additionalPayload
+      ...payload
     }
   };
 };
@@ -88,21 +87,21 @@ app.ws("/", (ws, request) => {
 
         estimationsByDeveloper[messageObject.payload.name] = null;
 
-        broadcast(createMessage("setEstimationsByDeveloper"));
+        broadcast(createMessage("setEstimationsByDeveloper", { estimationsByDeveloper }));
         break;
       case "resetDeveloperSelection":
         console.log("--> resetDeveloperSelection", messageObject.payload.name);
 
         delete estimationsByDeveloper[messageObject.payload.name];
 
-        broadcast(createMessage("setEstimationsByDeveloper"));
+        broadcast(createMessage("setEstimationsByDeveloper", { estimationsByDeveloper }));
         break;
       case "selectEstimation":
         console.log("--> selectEstimation", messageObject.payload.name, messageObject.payload.estimation);
 
         estimationsByDeveloper[messageObject.payload.name] = messageObject.payload.estimation;
 
-        broadcast(createMessage("setEstimationsByDeveloper"));
+        broadcast(createMessage("setEstimationsByDeveloper", { estimationsByDeveloper }));
         break;
       case "reset":
         console.log("--> reset");
