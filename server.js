@@ -78,35 +78,19 @@ app.ws("/", (ws, request) => {
 
     switch (messageObject.payload.action) {
       case "selectDeveloper":
-        console.log("--> selectDeveloper", messageObject.payload.name);
-
-        if (_.has(estimationsByDeveloper, messageObject.payload.name)) {
-          console.log(`--> ${messageObject.payload.name} already in state ...`);
-          break;
-        }
-
         estimationsByDeveloper[messageObject.payload.name] = null;
-
         broadcast(createMessage("setEstimationsByDeveloper", { estimationsByDeveloper }));
         break;
       case "resetDeveloperSelection":
-        console.log("--> resetDeveloperSelection", messageObject.payload.name);
-
         delete estimationsByDeveloper[messageObject.payload.name];
-
         broadcast(createMessage("setEstimationsByDeveloper", { estimationsByDeveloper }));
         break;
       case "selectEstimation":
-        console.log("--> selectEstimation", messageObject.payload.name, messageObject.payload.estimation);
-
         estimationsByDeveloper[messageObject.payload.name] = messageObject.payload.estimation;
-
         broadcast(createMessage("setEstimationsByDeveloper", { estimationsByDeveloper }));
         break;
       case "reset":
-        console.log("--> reset");
         estimationsByDeveloper = {};
-
         broadcast(createMessage("reset"));
         break;
     }
