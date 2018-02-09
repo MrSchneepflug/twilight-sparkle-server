@@ -41,10 +41,9 @@ const broadcast = (payload) => {
   });
 };
 
-const createMessage = (recipient, action, additionalPayload = {})  => {
+const createMessage = (action, additionalPayload = {})  => {
   return {
     origin: "web-socket-server",
-    recipient,
     action,
     payload: {
       estimationsByDeveloper,
@@ -53,12 +52,6 @@ const createMessage = (recipient, action, additionalPayload = {})  => {
   };
 };
 
-// const VALID_RECIPIENTS = [
-//   "*",
-//   "tv-client",
-//   "mobile-client"
-// ];
-//
 // const VALID_ACTIONS = [
 //   "setEstimationsByDeveloper",
 //   "reset"
@@ -66,7 +59,6 @@ const createMessage = (recipient, action, additionalPayload = {})  => {
 
 // const exampleMessage = {
 //   origin: "web-socket-server",
-//   recipient: "*",
 //   action: "setEstimationsByDeveloper",
 //   payload: {
 //     estimationsByDeveloper: {
@@ -74,7 +66,7 @@ const createMessage = (recipient, action, additionalPayload = {})  => {
 //       TK: 13
 //     },
 //     additionalPayload: {
-//
+//       [...]
 //     }
 //   }
 // };
@@ -96,27 +88,27 @@ app.ws("/", (ws, request) => {
 
         estimationsByDeveloper[messageObject.payload.name] = null;
 
-        broadcast(createMessage("*", "setEstimationsByDeveloper"));
+        broadcast(createMessage("setEstimationsByDeveloper"));
         break;
       case "resetDeveloperSelection":
         console.log("--> resetDeveloperSelection", messageObject.payload.name);
 
         delete estimationsByDeveloper[messageObject.payload.name];
 
-        broadcast(createMessage("*", "setEstimationsByDeveloper"));
+        broadcast(createMessage("setEstimationsByDeveloper"));
         break;
       case "selectEstimation":
         console.log("--> selectEstimation", messageObject.payload.name, messageObject.payload.estimation);
 
         estimationsByDeveloper[messageObject.payload.name] = messageObject.payload.estimation;
 
-        broadcast(createMessage("*", "setEstimationsByDeveloper"));
+        broadcast(createMessage("setEstimationsByDeveloper"));
         break;
       case "reset":
         console.log("--> reset");
         estimationsByDeveloper = {};
 
-        broadcast(createMessage("*", "reset"));
+        broadcast(createMessage("reset"));
         break;
     }
 
