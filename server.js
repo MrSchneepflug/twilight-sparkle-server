@@ -29,8 +29,6 @@ app.listen(PORT, () => {
 
 const webSocketServer = expressWs.getWss();
 
-let estimationsByDeveloper = {};
-
 const broadcast = (payload) => {
   const message = JSON.stringify(payload);
 
@@ -51,50 +49,34 @@ const createMessage = (action, payload = {})  => {
   };
 };
 
-// const VALID_ACTIONS = [
-//   "setEstimationsByDeveloper",
-//   "reset"
-// ];
-
-// const exampleMessage = {
-//   origin: "web-socket-server",
-//   action: "setEstimationsByDeveloper",
-//   payload: {
-//     estimationsByDeveloper: {
-//       JJ: null,
-//       TK: 13
-//     },
-//     additionalPayload: {
-//       [...]
-//     }
-//   }
-// };
+let state = {};
 
 app.ws("/", (ws, request) => {
   ws.on("message", message => {
     console.log("receiving", message);
 
     const messageObject = JSON.parse(message);
+    const payload = messageObject.payload;
 
-    switch (messageObject.payload.action) {
+    switch (payload.action) {
       case "selectDeveloper":
-        estimationsByDeveloper[messageObject.payload.name] = null;
-        broadcast(createMessage("setEstimationsByDeveloper", { estimationsByDeveloper }));
+        state[payload.name] = null;
+        broadcast(createMessage("update", { state }));
         break;
       case "resetDeveloperSelection":
-        delete estimationsByDeveloper[messageObject.payload.name];
-        broadcast(createMessage("setEstimationsByDeveloper", { estimationsByDeveloper }));
+        delete state[payload.name];
+        broadcast(createMessage("update", { state }));
         break;
       case "selectEstimation":
-        estimationsByDeveloper[messageObject.payload.name] = messageObject.payload.estimation;
-        broadcast(createMessage("setEstimationsByDeveloper", { estimationsByDeveloper }));
+        state[payload.name] = payload.estimation;
+        broadcast(createMessage("update", { state }));
         break;
       case "reset":
-        estimationsByDeveloper = {};
+        state = {};
         broadcast(createMessage("reset"));
         break;
     }
 
-    console.log("--> current state:", estimationsByDeveloper);
+    console.log("--> current state:", state);
   });
 });
