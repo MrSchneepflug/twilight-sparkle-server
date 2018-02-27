@@ -49,14 +49,15 @@ const createMessage = (action, payload = {})  => {
   };
 };
 
-let state = {};
+let id = 0;
+let state = [];
 
 function heartbeat() {
-  console.log("client is alive ...");
   this.isAlive = true;
 }
 
 webSocketServer.on("connection", client => {
+  client.id = ++id;
   client.isAlive = true;
   client.on("pong", heartbeat);
 });
@@ -64,6 +65,7 @@ webSocketServer.on("connection", client => {
 const interval = setInterval(() => {
   webSocketServer.clients.forEach(client => {
     if (client.isAlive === false) {
+      console.log("client disconnected ...");
       return client.terminate();
     }
 
@@ -74,29 +76,42 @@ const interval = setInterval(() => {
 
 app.ws("/", (ws, request) => {
   ws.on("message", message => {
-    console.log("receiving", message);
+    console.log("receiving", message, " from client with id ", ws.id);
 
+    let client;
     const messageObject = JSON.parse(message);
-    const payload = messageObject.payload;
+    const { origin, payload } = messageObject;
+
+    if (origin === "mobile") {
+      client = _.find(state, client => client.id === ws.id);
+    }
 
     switch (payload.action) {
+      case "initialize":
+        state.push({
+          id: ws.id,
+          developer: null,
+          estimation: null
+        });
+        broadcast(createMessage("update", { state }));
+        break;
       case "requestUpdate":
         broadcast(createMessage("update", { state }));
         break;
       case "selectDeveloper":
-        state[payload.name] = null;
+        client.developer = payload.name;
         broadcast(createMessage("update", { state }));
         break;
       case "resetDeveloperSelection":
-        delete state[payload.name];
+        client.developer = null;
         broadcast(createMessage("update", { state }));
         break;
       case "selectEstimation":
-        state[payload.name] = payload.estimation;
+        client.estimation = payload.estimation;
         broadcast(createMessage("update", { state }));
         break;
       case "reset":
-        state = {};
+        state = [];
         broadcast(createMessage("reset"));
         break;
     }
