@@ -59,6 +59,9 @@ app.ws("/", (ws, request) => {
     const payload = messageObject.payload;
 
     switch (payload.action) {
+      case "requestUpdate":
+        broadcast(createMessage("update", { state }));
+        break;
       case "selectDeveloper":
         state[payload.name] = null;
         broadcast(createMessage("update", { state }));
