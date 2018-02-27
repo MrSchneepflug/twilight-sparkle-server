@@ -51,6 +51,27 @@ const createMessage = (action, payload = {})  => {
 
 let state = {};
 
+function heartbeat() {
+  console.log("client is alive ...");
+  this.isAlive = true;
+}
+
+webSocketServer.on("connection", client => {
+  client.isAlive = true;
+  client.on("pong", heartbeat);
+});
+
+const interval = setInterval(() => {
+  webSocketServer.clients.forEach(client => {
+    if (client.isAlive === false) {
+      return client.terminate();
+    }
+
+    client.isAlive = false;
+    client.ping(() => {});
+  });
+}, 1000);
+
 app.ws("/", (ws, request) => {
   ws.on("message", message => {
     console.log("receiving", message);
