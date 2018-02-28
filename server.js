@@ -90,11 +90,7 @@ app.ws("/", ws => {
         break;
       case "selectEstimation":
         client.estimation = payload.estimation;
-        broadcast(createMessage("update", { state }));
-        break;
-      case "reset":
-        state = [];
-        broadcast(createMessage("reset"));
+        broadcast(createMessage("update", {state}));
         break;
     }
 
