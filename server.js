@@ -13,13 +13,7 @@ const PORT = process.env.port || 5000;
 app.use(express.static("public"));
 
 app.get("/", (request, response) => {
-  const isMobileDevice = request.headers["user-agent"].match(/Mobile/);
-  const indexPath = isMobileDevice
-    ? "public/mobile_index.html"
-    : "public/tv_index.html";
-
-  const INDEX = path.join(__dirname, indexPath);
-
+  const INDEX = path.join(__dirname, "public/index.html");
   response.sendFile(INDEX);
 });
 
