@@ -75,6 +75,12 @@ const interval = setInterval(() => {
 }, 1000);
 
 app.ws("/", (ws, request) => {
+  ws.on("close", (code, reason) => {
+    console.log(`${ws.id} closed the connection with code: ${code} and reason: ${reason}`);
+    _.remove(state, client => client.id === ws.id);
+    broadcast(createMessage("update", { state }))
+  });
+
   ws.on("message", message => {
     console.log("receiving", message, " from client with id ", ws.id);
 
