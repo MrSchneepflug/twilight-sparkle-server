@@ -46,29 +46,11 @@ const createMessage = (action, payload = {})  => {
 let id = 0;
 let state = [];
 
-function heartbeat() {
-  this.isAlive = true;
-}
-
 webSocketServer.on("connection", client => {
   client.id = ++id;
-  client.isAlive = true;
-  client.on("pong", heartbeat);
 });
 
-const interval = setInterval(() => {
-  webSocketServer.clients.forEach(client => {
-    if (client.isAlive === false) {
-      console.log("client disconnected ...");
-      return client.terminate();
-    }
-
-    client.isAlive = false;
-    client.ping(() => {});
-  });
-}, 1000);
-
-app.ws("/", (ws, request) => {
+app.ws("/", ws => {
   ws.on("close", (code, reason) => {
     console.log(`${ws.id} closed the connection with code: ${code} and reason: ${reason}`);
     _.remove(state, client => client.id === ws.id);
