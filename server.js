@@ -1,4 +1,3 @@
-const Server = require("./src/Server");
 const _ = require("lodash");
 const express = require("express");
 const app = express();
@@ -7,6 +6,14 @@ const expressWs = require("express-ws")(app, null, {
     clientTracking: true
   }
 });
+
+const Server = require("./src/Server");
+const store = require("./src/store");
+
+const initializeClient = require("./src/actions/initializeClient");
+const removeClient = require("./src/actions/removeClient");
+const setDeveloper = require("./src/actions/setDeveloper");
+const setEstimation = require("./src/actions/setEstimation");
 
 const path = require("path");
 const PORT = process.env.port || 5000;
@@ -23,12 +30,12 @@ app.listen(PORT, () => {
 });
 
 const webSocketServer = expressWs.getWss();
-const server = new Server(webSocketServer);
+const server = new Server(webSocketServer, store);
 
 app.ws("/", ws => {
   ws.on("close", (code, reason) => {
     console.log(`${ws.id} closed the connection with code: ${code} and reason: ${reason}`);
-    server.removeClient(ws.id);
+    store.dispatch(removeClient(ws.id));
     server.broadcastState();
   });
 
@@ -40,18 +47,18 @@ app.ws("/", ws => {
 
     switch (payload.action) {
       case "initialize":
-        server.initializeClient(ws.id);
+        store.dispatch(initializeClient(ws.id));
         break;
       case "requestUpdate":
         break;
       case "selectDeveloper":
-        server.setDeveloper(ws.id, payload.name);
+        store.dispatch(setDeveloper(ws.id, payload.name));
         break;
       case "resetDeveloperSelection":
-        server.setDeveloper(ws.id, null);
+        store.dispatch(setDeveloper(ws.id, null));
         break;
       case "selectEstimation":
-        server.setEstimation(ws.id, payload.estimation);
+        store.dispatch(setEstimation(ws.id, payload.estimation));
         break;
     }
 
