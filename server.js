@@ -10,10 +10,12 @@ const expressWs = require("express-ws")(app, null, {
 const Server = require("./src/Server");
 const store = require("./src/store");
 
-const initializeClient = require("./src/actions/initializeClient");
-const removeClient = require("./src/actions/removeClient");
-const selectDeveloper = require("./src/actions/selectDeveloper");
-const selectEstimation = require("./src/actions/selectEstimation");
+const {
+  initializeClient,
+  removeClient,
+  selectDeveloper,
+  selectEstimation
+} = require("./src/actions");
 
 const path = require("path");
 const PORT = process.env.port || 5000;
