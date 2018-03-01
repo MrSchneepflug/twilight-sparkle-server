@@ -15,11 +15,11 @@ function rootReducer(state = [], action) {
     case "REMOVE_CLIENT":
       _.remove(newState, client => client.id === action.id);
       break;
-    case "SET_DEVELOPER":
+    case "SELECT_DEVELOPER":
       client = _.find(newState, client => client.id === action.id);
       client.developer = action.developer;
       break;
-    case "SET_ESTIMATION":
+    case "SELECT_ESTIMATION":
       client = _.find(newState, client => client.id === action.id);
       client.estimation = action.estimation;
       break;

@@ -12,8 +12,8 @@ const store = require("./src/store");
 
 const initializeClient = require("./src/actions/initializeClient");
 const removeClient = require("./src/actions/removeClient");
-const setDeveloper = require("./src/actions/setDeveloper");
-const setEstimation = require("./src/actions/setEstimation");
+const selectDeveloper = require("./src/actions/selectDeveloper");
+const selectEstimation = require("./src/actions/selectEstimation");
 
 const path = require("path");
 const PORT = process.env.port || 5000;
@@ -52,13 +52,13 @@ app.ws("/", ws => {
       case "requestUpdate":
         break;
       case "selectDeveloper":
-        store.dispatch(setDeveloper(ws.id, payload.name));
+        store.dispatch(selectDeveloper(ws.id, payload.name));
         break;
       case "resetDeveloperSelection":
-        store.dispatch(setDeveloper(ws.id, null));
+        store.dispatch(selectDeveloper(ws.id, null));
         break;
       case "selectEstimation":
-        store.dispatch(setEstimation(ws.id, payload.estimation));
+        store.dispatch(selectEstimation(ws.id, payload.estimation));
         break;
     }
 
