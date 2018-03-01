@@ -1,3 +1,5 @@
+const Server = require("./src/Server");
+const _ = require("lodash");
 const express = require("express");
 const app = express();
 const expressWs = require("express-ws")(app, null, {
@@ -5,7 +7,6 @@ const expressWs = require("express-ws")(app, null, {
     clientTracking: true
   }
 });
-const _ = require("lodash");
 
 const path = require("path");
 const PORT = process.env.port || 5000;
@@ -22,78 +23,38 @@ app.listen(PORT, () => {
 });
 
 const webSocketServer = expressWs.getWss();
-
-const broadcast = (payload) => {
-  const message = JSON.stringify(payload);
-
-  console.log("--> broadcasting", message);
-
-  webSocketServer.clients.forEach(client => {
-    client.send(message);
-  });
-};
-
-const createMessage = (action, payload = {})  => {
-  return {
-    origin: "web-socket-server",
-    action,
-    payload: {
-      ...payload
-    }
-  };
-};
-
-let id = 0;
-let state = [];
-
-webSocketServer.on("connection", client => {
-  client.id = ++id;
-});
+const server = new Server(webSocketServer);
 
 app.ws("/", ws => {
   ws.on("close", (code, reason) => {
     console.log(`${ws.id} closed the connection with code: ${code} and reason: ${reason}`);
-    _.remove(state, client => client.id === ws.id);
-    broadcast(createMessage("update", { state }))
+    server.removeClient(ws.id);
+    server.broadcastState();
   });
 
   ws.on("message", message => {
     console.log("receiving", message, " from client with id ", ws.id);
 
-    let client;
     const messageObject = JSON.parse(message);
-    const { origin, payload } = messageObject;
-
-    if (origin === "mobile") {
-      client = _.find(state, client => client.id === ws.id);
-    }
+    const payload = messageObject.payload;
 
     switch (payload.action) {
       case "initialize":
-        state.push({
-          id: ws.id,
-          developer: null,
-          estimation: null
-        });
-        broadcast(createMessage("update", { state }));
+        server.initializeClient(ws.id);
         break;
       case "requestUpdate":
-        broadcast(createMessage("update", { state }));
         break;
       case "selectDeveloper":
-        client.developer = payload.name;
-        broadcast(createMessage("update", { state }));
+        server.setDeveloper(ws.id, payload.name);
         break;
       case "resetDeveloperSelection":
-        client.developer = null;
-        broadcast(createMessage("update", { state }));
+        server.setDeveloper(ws.id, null);
         break;
       case "selectEstimation":
-        client.estimation = payload.estimation;
-        broadcast(createMessage("update", {state}));
+        server.setEstimation(ws.id, payload.estimation);
         break;
     }
 
-    console.log("--> current state:", state);
+    server.broadcastState();
   });
 });
