@@ -1,14 +1,12 @@
 const _ = require("lodash");
 
-let id = 0;
-
 class Server {
   constructor(webSocketServer, store) {
     this.webSocketServer = webSocketServer;
     this.store = store;
 
     webSocketServer.on("connection", client => {
-      client.id = ++id;
+      client.id = store.getState().nextClientId;
     });
   }
 
@@ -16,7 +14,7 @@ class Server {
     const messageObject = {
       origin: "web-socket-server",
       action: "update",
-      state: this.store.getState()
+      state: this.store.getState().clients
     };
 
     const message = JSON.stringify(messageObject);

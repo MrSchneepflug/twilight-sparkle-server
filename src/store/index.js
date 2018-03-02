@@ -1,5 +1,10 @@
 const redux = require("redux");
 const rootReducer = require("../reducers");
 
-module.exports = redux.createStore(rootReducer, []);
+const initialState = {
+  nextClientId: 1,
+  clients: []
+};
+
+module.exports = redux.createStore(rootReducer, initialState);
 
