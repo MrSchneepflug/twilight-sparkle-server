@@ -1,11 +1,4 @@
-const _ = require("lodash");
-const express = require("express");
-const app = express();
-const expressWs = require("express-ws")(app, null, {
-  wsOptions: {
-    clientTracking: true
-  }
-});
+const WebSocket = require("ws");
 
 const Server = require("./src/Server");
 const store = require("./src/store");
@@ -17,24 +10,13 @@ const {
   selectEstimation
 } = require("./src/actions");
 
-const path = require("path");
-const PORT = process.env.port || 5000;
-
-app.use(express.static("public"));
-
-app.get("/", (request, response) => {
-  const INDEX = path.join(__dirname, "public/index.html");
-  response.sendFile(INDEX);
+const webSocketServer = new WebSocket.Server({
+  port: process.env.port || 5000
 });
 
-app.listen(PORT, () => {
-  console.log(`listening on port ${PORT}`)
-});
-
-const webSocketServer = expressWs.getWss();
 const server = new Server(webSocketServer, store);
 
-app.ws("/", ws => {
+webSocketServer.on("connection", function (ws) {
   ws.on("close", (code, reason) => {
     console.log(`${ws.id} closed the connection with code: ${code} and reason: ${reason}`);
     store.dispatch(removeClient(ws.id));
