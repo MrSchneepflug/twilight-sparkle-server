@@ -10,11 +10,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "nodemon": "^1.14.11",
-    "lodash": "^4.17.4",
-    "redux": "^3.7.2",
-    "ws": "^4.0.0",
     "bufferutil": "^3.0.3",
-    "utf-8-validate": "^4.0.0"
+    "colors": "^1.2.1",
+    "lodash": "^4.17.4",
+    "nodemon": "^1.14.11",
+    "redux": "^3.7.2",
+    "utf-8-validate": "^4.0.0",
+    "ws": "^4.0.0"
   }
 }
