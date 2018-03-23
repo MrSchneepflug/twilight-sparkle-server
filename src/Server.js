@@ -17,10 +17,7 @@ class Server {
       state: this.store.getState().clients
     };
 
-    const message = JSON.stringify(messageObject);
-    console.log(`broadcasting ${message}`);
-
-    this.webSocketServer.clients.forEach(client => client.send(message));
+    this.webSocketServer.clients.forEach(client => client.send(JSON.stringify(messageObject)));
   }
 }
 
