@@ -19,7 +19,7 @@ const server = new Server(webSocketServer, store);
 
 webSocketServer.on("connection", ws => {
   ws.on("close", (code, reason) => {
-    console.log(`${ws.id} closed the connection with code: ${code} and reason: ${reason}`);
+    console.log(colors.red(`${ws.id ? `#${ws.id}` : "client"} closed the connection ${reason ? `(reason: ${reason})` : ""}`));
     store.dispatch(removeClient(ws.id));
     server.broadcastState();
   });
