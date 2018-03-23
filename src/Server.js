@@ -4,10 +4,6 @@ class Server {
   constructor(webSocketServer, store) {
     this.webSocketServer = webSocketServer;
     this.store = store;
-
-    webSocketServer.on("connection", client => {
-      client.id = store.getState().nextClientId;
-    });
   }
 
   broadcastState() {

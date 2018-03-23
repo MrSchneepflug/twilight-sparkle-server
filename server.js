@@ -32,6 +32,7 @@ webSocketServer.on("connection", ws => {
 
     switch (payload.action) {
       case "initialize":
+        ws.id = store.getState().nextClientId;
         store.dispatch(initializeClient(ws.id));
         break;
       case "requestUpdate":
