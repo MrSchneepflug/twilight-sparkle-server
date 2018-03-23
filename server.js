@@ -78,7 +78,7 @@ function logCurrentState(state) {
     return colors.bold(`${client.developer} ${client.estimation ? `(${client.estimation})` : ""}`);
   }).join(", ");
 
-  console.log(`-- next client-id: ${state.nextClientId}`);
-  console.log(`-- connected clients: ${clients.length}`);
-  console.log(`-- developers: ${developerList.length === 0 ? "none" : developerList}`);
+  console.log(`-- next client-id: ${colors.bold(state.nextClientId)}`);
+  console.log(`-- connected clients: ${colors.bold(clients.length)}`);
+  console.log(`-- developers: ${developerList.length === 0 ? colors.bold("none") : developerList}`);
 }
