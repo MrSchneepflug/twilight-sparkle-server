@@ -11,6 +11,11 @@ const {
   selectEstimation
 } = require("./src/actions");
 
+const {
+  logMessage,
+  logCurrentState
+} = require("./src/logging");
+
 const webSocketServer = new WebSocket.Server({
   port: process.env.port || 5000
 });
@@ -57,29 +62,3 @@ webSocketServer.on("connection", ws => {
     console.error(error);
   });
 });
-
-function logMessage(id, messageObject) {
-  const actionMap = {
-    initialize: colors.green("initialize"),
-    requestUpdate: colors.blue("requestUpdate"),
-    selectDeveloper: colors.yellow("selectDeveloper"),
-    resetDeveloperSelection: colors.yellow("resetDeveloperSelection"),
-    selectEstimation: colors.magenta("selectEstimation")
-  };
-
-  const client = colors.white(`client ${id ? `#${id} ` : ""}(${messageObject.origin}):`);
-  console.log(`${client} ${actionMap[messageObject.payload.action]}`);
-}
-
-function logCurrentState(state) {
-  const clients = state.clients;
-
-  const developerList = clients.filter(client => client.developer !== null).map(client => {
-    return colors.bold(`${client.developer} ${client.estimation ? `(${client.estimation})` : ""}`);
-  }).join(", ");
-
-  console.log(`-- next client-id: ${colors.bold(state.nextClientId)}`);
-  console.log(`-- connected clients: ${colors.bold(clients.length)}`);
-  console.log(`-- developers: ${developerList.length === 0 ? colors.bold("none") : developerList}`);
-  console.log(`-- raw state: ${colors.cyan(JSON.stringify(state))}`);
-}
