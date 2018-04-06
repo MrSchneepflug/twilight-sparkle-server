@@ -81,4 +81,5 @@ function logCurrentState(state) {
   console.log(`-- next client-id: ${colors.bold(state.nextClientId)}`);
   console.log(`-- connected clients: ${colors.bold(clients.length)}`);
   console.log(`-- developers: ${developerList.length === 0 ? colors.bold("none") : developerList}`);
+  console.log(`-- raw state: ${colors.cyan(JSON.stringify(state))}`);
 }
