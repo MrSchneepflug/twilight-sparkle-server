@@ -13,7 +13,11 @@ class Server {
       state: this.store.getState().clients
     };
 
-    this.webSocketServer.clients.forEach(client => client.send(JSON.stringify(messageObject)));
+    this.webSocketServer.clients.forEach(client => {
+      if (client.readyState === client.OPEN) {
+        client.send(JSON.stringify(messageObject))
+      }
+    });
   }
 }
 
