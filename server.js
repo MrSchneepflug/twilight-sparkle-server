@@ -8,7 +8,8 @@ const {
   initializeClient,
   removeClient,
   selectDeveloper,
-  selectEstimation
+  selectEstimation,
+  resetEstimations
 } = require("./src/actions");
 
 const {
@@ -39,23 +40,30 @@ webSocketServer.on("connection", ws => {
       case "initialize":
         ws.id = store.getState().nextClientId;
         store.dispatch(initializeClient(ws.id));
+        server.broadcastState();
         break;
       case "requestState":
+        server.broadcastState();
+        break;
+      case "resetEstimations":
+        store.dispatch(resetEstimations());
+        server.broadcastResetEstimation();
         break;
       case "selectDeveloper":
         store.dispatch(selectDeveloper(ws.id, payload.name));
+        server.broadcastState();
         break;
       case "resetDeveloperSelection":
         store.dispatch(selectDeveloper(ws.id, null));
+        server.broadcastState();
         break;
       case "selectEstimation":
         store.dispatch(selectEstimation(ws.id, payload.estimation));
+        server.broadcastState();
         break;
     }
 
     logCurrentState(store.getState());
-
-    server.broadcastState();
   });
 
   ws.on("error", error => {
