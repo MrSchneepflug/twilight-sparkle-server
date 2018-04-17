@@ -23,6 +23,9 @@ function clients(state = [], action) {
       client = _.find(newState, client => client.id === action.id);
       client.estimation = action.estimation;
       break;
+    case "RESET_ESTIMATIONS":
+      _.forEach(newState, client => client.estimation = null);
+      break;
     default:
       return state;
   }
