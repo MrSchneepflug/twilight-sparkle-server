@@ -7,7 +7,8 @@ module.exports = {
       requestState: colors.blue("requestState"),
       selectDeveloper: colors.yellow("selectDeveloper"),
       resetDeveloperSelection: colors.yellow("resetDeveloperSelection"),
-      selectEstimation: colors.magenta("selectEstimation")
+      selectEstimation: colors.magenta("selectEstimation"),
+      resetEstimations: colors.magenta("resetEstimations")
     };
 
     const client = colors.white(`client ${id ? `#${id} ` : ""}(${messageObject.origin}):`);
@@ -25,5 +26,4 @@ module.exports = {
     console.log(`-- developers: ${developerList.length === 0 ? colors.bold("none") : developerList}`);
     console.log(`-- raw state: ${colors.cyan(JSON.stringify(state))}`);
   }
-}
-
+};
