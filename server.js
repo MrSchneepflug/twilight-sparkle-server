@@ -53,10 +53,6 @@ webSocketServer.on("connection", ws => {
         store.dispatch(selectDeveloper(ws.id, payload.name));
         server.broadcastState();
         break;
-      case "resetDeveloperSelection":
-        store.dispatch(selectDeveloper(ws.id, null));
-        server.broadcastState();
-        break;
       case "selectEstimation":
         store.dispatch(selectEstimation(ws.id, payload.estimation));
         server.broadcastState();
